@@ -27,7 +27,7 @@ tokenizer.padding_side = "right"
 model = AutoModelForCausalLM.from_pretrained(base_model,
                                              device_map="cuda",
                                              torch_dtype=torch.bfloat16,
-                                             quantieation_config=bnb_config,
+                                             quantization_config=bnb_config,
                                              token=auth_token)
 print(f"{Fore.GREEN}Model loaded successfully !\n")
 
