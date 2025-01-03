@@ -1,0 +1,10 @@
+transformers
+colorama
+tqdm
+pandas
+matplotlib
+seaborn
+torch
+accelerate
+bitsandbytes
+nltk
