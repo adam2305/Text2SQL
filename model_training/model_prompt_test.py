@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from colorama import Fore
 import colorama
 from tqdm import tqdm
@@ -10,6 +10,8 @@ auth_token = "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"
 base_model = "google/gemma-2-2b-it"
 
 print("Loading model...")
+bnb_config = BitsAndBytesConfig(load_in_8bit=True)
+
 tokenizer = AutoTokenizer.from_pretrained(base_model,
                                           use_fast=True,
                                           token=auth_token)
@@ -17,9 +19,10 @@ tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
 model = AutoModelForCausalLM.from_pretrained(base_model,
-                                             device_map="cuda",
-                                             torch_dtype=torch.bfloat16,
-                                             token=auth_token)
+                                            device_map="cuda",
+                                            torch_dtype=torch.bfloat16,
+                                            quantieation_config=bnb_config,
+                                            token=auth_token)
 print(f"{Fore.GREEN}Model loaded successfully !\n")
 
 
