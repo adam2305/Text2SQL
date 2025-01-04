@@ -18,8 +18,11 @@ def change_input_instruction(path, instruction):
 
 def get_input_gemma_template(data):
     return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "SQL tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
+             "content": data["instruction"] + "\n\n" + "Example : " + data["question"] + "\n\n" + "tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
 
+def get_input_gemma_template_fewshot(data):
+    return [{"role": "user",
+             "content": data["instruction"] + "\n\n" + "SQL tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
 
 def balance_parentheses(query):
     open_count = 0

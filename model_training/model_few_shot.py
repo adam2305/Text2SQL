@@ -4,11 +4,11 @@ from colorama import Fore
 import colorama
 from tqdm import tqdm
 import json
-from utils import change_input_instruction, get_input_gemma_template, open_json_file
+from utils import change_input_instruction, get_input_gemma_template_fewshot, open_json_file
 
 colorama.init(autoreset=True)
 
-dev_data_path = "../data_processing/data/formated_dev_data.json"
+dev_data_path = "../data_processing/data/formated_dev_data_few_shot.json"
 auth_token = "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"
 base_model = "google/gemma-2-2b-it"
 input_instruction = "Convert the following question into an SQL query using the provided database schema. The output should contain only the SQL statement."
@@ -39,7 +39,7 @@ data = open_json_file(dev_data_path)
 output_data = []
 
 for format_data in tqdm(data):
-    input = get_input_gemma_template(format_data)
+    input = get_input_gemma_template_fewshot(format_data)
     token_inputs = tokenizer.apply_chat_template(input,
                                                 tokenize=True,
                                                 token=auth_token,
