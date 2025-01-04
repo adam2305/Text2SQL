@@ -51,6 +51,30 @@ def save_json(data, path):
         json.dump(data, file, indent=4)
 
 
+def convert_to_rag_format(input_json):
+    rag_data = []
+
+    for db in input_json:
+        db_id = db['db_id']
+        schema = db['schema']
+        documents = []
+        documents.append({"text": f"Schema for {db_id} database: {schema.split('\n')[0]}"})
+        tables_info = schema.split("\n\n")[1:]
+        for table_info in tables_info:
+            lines = table_info.split("\n")
+            table_name = lines[0].strip()
+            columns_info = "\n".join(lines[1:]).strip()
+            documents.append({"text": f"{table_name}: {columns_info}"})
+        relationships_info = schema.split("### Key Relationships:")[1:]
+        if relationships_info:
+            documents.append({"text": f"Relationships: {relationships_info[0].strip()}"})
+        rag_data.append({
+            "db_id": db_id,
+            "documents": documents
+        })
+
+    return rag_data
+
 
 table_description = get_json('data/tables_description.json')
 table_description_enhanced = get_json('data/tables_description_enhanced.json')
@@ -65,10 +89,13 @@ formated_dev_data_enhanced = format_data(raw_dev_data, table_description_enhance
 
 formated_train_data_few_shot = format_data_few_shot(raw_dev_data, table_description_enhanced, few_shot)
 
+RAG_data = convert_to_rag_format(formated_dev_data_enhanced)
+
 save_json(formated_train_data, 'data/formated_train_data.json')
 save_json(formated_dev_data, 'data/formated_dev_data.json')
 save_json(formated_dev_data_enhanced, 'data/formated_dev_data_enhanced.json')
 save_json(formated_train_data_few_shot, 'data/formated_dev_data_few_shot.json')
+save_json(RAG_data, 'data/RAG_data.json')
 
 
 

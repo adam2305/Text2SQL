@@ -22,7 +22,11 @@ def get_input_gemma_template(data):
 
 def get_input_gemma_template_fewshot(data):
     return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "SQL tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
+             "content": data["instruction"] + "\n\n" + "tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
+
+def get_input_gemma_template_RAG(data, RAG):
+    return [{"role": "user",
+             "content": data["instruction"] + "\n\n" + "tables schema : " + data["schema"] + "Relevant information : " + RAG + "\n\n" + "Question : " + data["input"]}]
 
 def balance_parentheses(query):
     open_count = 0
@@ -44,6 +48,7 @@ def clean_output(output):
     if start_index != -1 and end_index != -1 and start_index < end_index:
         return output[start_index:end_index + 1]
     return ""
+
 
 
 
