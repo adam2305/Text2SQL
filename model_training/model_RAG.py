@@ -49,10 +49,20 @@ def load_rag_data(rag_json_path):
 def initialize_faiss_index(documents, model, tokenizer):
     embeddings = []
     for doc in documents:
+        # Tokenize the document
         inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True).to(model.device)
+
+        # Get the embeddings from the model's output, with output_hidden_states=True
         with torch.no_grad():
-            outputs = model.base_model(**inputs)
-            embeddings.append(outputs.last_hidden_state.mean(dim=1).cpu().numpy())
+            outputs = model(**inputs, output_hidden_states=True)
+            # Extract the last hidden state from the model output
+            last_hidden_state = outputs.hidden_states[-1]  # Get the last layer's hidden states
+            # Mean pooling over the sequence length (dim=1)
+            doc_embedding = last_hidden_state.mean(dim=1).cpu().numpy()
+            embeddings.append(doc_embedding)
+
+    # Create FAISS index from the embeddings (example, adapt as needed)
+    # index = faiss.IndexFlatL2(embeddings[0].shape[0])
     return embeddings
 
 
