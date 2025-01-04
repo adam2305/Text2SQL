@@ -15,7 +15,7 @@ input_instruction = "Convert the following natural language query into an SQL st
 
 
 print("Loading model...")
-bnb_config = BitsAndBytesConfig(load_in_8bit=True)
+bnb_config = BitsAndBytesConfig(load_in_4bit=True)
 
 tokenizer = AutoTokenizer.from_pretrained(base_model,
                                           use_fast=True,
