@@ -68,7 +68,7 @@ formated_train_data_few_shot = format_data_few_shot(raw_dev_data, table_descript
 save_json(formated_train_data, 'data/formated_train_data.json')
 save_json(formated_dev_data, 'data/formated_dev_data.json')
 save_json(formated_dev_data_enhanced, 'data/formated_dev_data_enhanced.json')
-save_json(formated_train_data_few_shot, 'data/formated_train_data_few_shot.json')
+save_json(formated_train_data_few_shot, 'data/formated_dev_data_few_shot.json')
 
 
 
