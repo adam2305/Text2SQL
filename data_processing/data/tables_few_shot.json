@@ -1,0 +1,82 @@
+[
+    {
+        "db_id": "concert_singer",
+        "few_shot": "Question: \"Get the concerts held in 2020.\"\n```sql: \nSELECT concert_Name \nFROM concert \nWHERE Year = 2020; '''"
+    },
+    {
+        "db_id": "pets_1",
+        "few_shot": "Question: \"Find the names and ages of students with pets older than 5 years.\"\n```sql: \nSELECT Student.Fname, Student.LName, Pets.pet_age \nFROM Student \nJOIN Has_Pet ON Student.StuID = Has_Pet.StuID \nJOIN Pets ON Has_Pet.PetID = Pets.PetID \nWHERE Pets.pet_age > 5; '''"
+    },
+    {
+        "db_id": "car_1",
+        "few_shot": "Question: \"Find the models of cars made by Ford.\"\n```sql: \nSELECT model_list.Model \nFROM model_list \nJOIN car_makers ON model_list.Maker = car_makers.Id \nWHERE car_makers.Maker = 'Ford'; '''"
+    },
+    {
+        "db_id": "flight_2",
+        "few_shot": "Question: \"Get all flights operated by the airline 'Delta'.\"\n```sql: \nSELECT flights.FlightNo \nFROM flights \nJOIN airlines ON flights.Airline = airlines.uid \nWHERE airlines.Airline = 'Delta'; '''"
+    },
+    {
+        "db_id": "employee_hire_evaluation",
+        "few_shot": "Question: \\\"Get all employees who work at the shop 'BestBuy'.\\\"\\n```sql\\nSELECT employee.Name \\nFROM employee \\nJOIN hiring ON employee.Employee_ID = hiring.Employee_ID \\nJOIN shop ON hiring.Shop_ID = shop.Shop_ID \\nWHERE shop.Name = 'BestBuy';\\n```"
+    },
+    {
+        "db_id": "cre_Doc_Template_Mgt",
+        "few_shot": "Question: \\\"List all documents created using template version 2.0\\\"\\n```sql\\nSELECT documents.Document_Name, documents.Document_Description \\nFROM documents \\nJOIN templates ON documents.Template_ID = templates.Template_ID \\nWHERE templates.Version_Number = 2.0;\\n```"
+    },
+    {
+        "db_id": "course_teach",
+        "few_shot": "Question: \\\"List all courses and their starting dates\\\"\\n```sql\\nSELECT course.Course, course.Starting_Date \\nFROM course;\\n```"
+    },
+    {
+        "db_id": "museum_visit",
+        "few_shot": "Question: \\\"List all museums and the number of staff they have.\\\"\\n```sql\\nSELECT museum.Name, museum.Num_of_Staff \\nFROM museum;\\n```"
+    },
+    {
+        "db_id": "wta_1",
+        "few_shot": "Question: \\\"List all players with their ranking points as of January 2024.\\\"\\n```sql\\nSELECT players.first_name, players.last_name, rankings.ranking_points \\nFROM players \\nJOIN rankings ON players.player_id = rankings.player_id \\nWHERE rankings.ranking_date = '2024-01-01';\\n```"
+    },
+    {
+        "db_id": "battle_death",
+        "few_shot": "Question: \\\"List all players with their ranking points as of January 2024.\\\"\\n```sql\\nSELECT players.first_name, players.last_name, rankings.ranking_points \\nFROM players \\nJOIN rankings ON players.player_id = rankings.player_id \\nWHERE rankings.ranking_date = '2024-01-01';\\n```"
+    },
+    {
+        "db_id": "student_transcripts_tracking",
+        "few_shot": "Question: \\\"Get the list of courses offered in the 'Spring 2025' semester.\\\"\\n```sql\\nSELECT courses.course_name, courses.course_description \\nFROM courses \\nJOIN sections ON courses.course_id = sections.course_id \\nJOIN semesters ON sections.semester_id = semesters.semester_id \\nWHERE semesters.semester_name = 'Spring 2025';\\n```"
+    },
+    {
+        "db_id": "tvshow",
+        "few_shot": "Question: \\\"List all TV series aired by channel 'ABC' in 2024.\\\"\\n```sql\\nSELECT tv_series.Episode, tv_series.Air_Date, tv_series.Rating \\nFROM tv_series \\nJOIN tv_channel ON tv_series.Channel = tv_channel.id \\nWHERE tv_channel.series_name = 'ABC' AND YEAR(tv_series.Air_Date) = 2024;\\n```"
+    },
+    {
+        "db_id": "poker_player",
+        "few_shot": "Question: \\\"List all poker players with their best finish and earnings.\\\"\\n```sql\\nSELECT people.Name, poker_player.Best_Finish, poker_player.Earnings \\nFROM poker_player \\nJOIN people ON poker_player.People_ID = people.People_ID;\\n```"
+    },
+    {
+        "db_id": "voter_1",
+        "few_shot": ""
+    },
+    {
+        "db_id": "world_1",
+        "few_shot": ""
+    },
+    {
+        "db_id": "orchestra",
+        "few_shot": "Question: \\\"List all orchestras and their conductors.\\\"\\n```sql\\nSELECT orchestra.Orchestra, conductor.Name \\nFROM orchestra \\nJOIN conductor ON orchestra.Conductor_ID = conductor.Conductor_ID;\\n```"
+    },
+    {
+        "db_id": "network_1",
+        "few_shot": "Question: \\\"List all friends of a given student (e.g., student with ID 1).\\\"\\n```sql\\nSELECT h.name \\nFROM Friend f \\nJOIN Highschooler h ON f.friend_id = h.ID \\nWHERE f.student_id = 1;\\n```"
+    },
+    {
+        "db_id": "dog_kennels",
+        "few_shot": "Question: \\\"Find the charges for treatments or services.\\\"\\n```sql\\nSELECT charge_type, charge_amount FROM Charges;\\n```"
+    },
+    {
+        "db_id": "singer",
+        "few_shot": "Question: \\\"List all songs along with their sales and highest chart position.\\\"\\n```sql\\nSELECT Title, Sales, Highest_Position FROM song;\\n```"
+    },
+    {
+        "db_id": "real_estate_properties",
+        "few_shot": "Question: \\\"List all features available for properties.\\\"\\n```sql\\nSELECT feature_name FROM Other_Available_Features;\\n```"
+    }
+]
