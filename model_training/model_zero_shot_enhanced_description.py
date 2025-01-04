@@ -11,7 +11,7 @@ colorama.init(autoreset=True)
 dev_data_path = "../data_processing/data/formated_dev_data_enhanced.json"
 auth_token = "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"
 base_model = "google/gemma-2-2b-it"
-input_instruction = "Convert the following natural language query into an SQL statement. Return excusively the SQL statement."
+input_instruction = "Convert the following natural language query into an SQL code. The output should contain only the SQL statement."
 
 
 print("Loading model...")
