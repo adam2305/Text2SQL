@@ -15,7 +15,7 @@ input_instruction = "Convert the following question into an SQL query using the 
 
 
 print("Loading model...")
-bnb_config = BitsAndBytesConfig(load_in_4bit=True)
+bnb_config = BitsAndBytesConfig(load_in_8bit=True)
 
 tokenizer = AutoTokenizer.from_pretrained(base_model,
                                           use_fast=True,
