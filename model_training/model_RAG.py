@@ -46,7 +46,7 @@ def load_rag_data(rag_json_path):
 
 def initialize_faiss_index(documents, model, tokenizer, max_length=512):
     embeddings = []
-    for doc in documents:
+    for doc in tqdm(documents):
         inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(
             model.device)
         with torch.no_grad():
@@ -105,6 +105,6 @@ for format_data in tqdm(data):
 print(f"{Fore.GREEN}Inference completed !\n")
 
 print("Saving results...\n")
-with open("outputs/zero_shot_results.json", "w") as f:
+with open("outputs/RAG_results.json", "w") as f:
     json.dump(output_data, f)
 print(f"{Fore.GREEN}Results saved successfully !\n")
