@@ -61,7 +61,7 @@ for format_data in tqdm(data):
 print(f"{Fore.GREEN}Inference completed !\n")
 
 print("Saving results...\n")
-with open("outputs/zero_shot_results.json", "w") as f:
+with open("outputs/few_shot_shot_results.json", "w") as f:
     json.dump(output_data, f)
 print(f"{Fore.GREEN}Results saved successfully !\n")
 
