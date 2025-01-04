@@ -74,8 +74,10 @@ print("Starting inference...")
 change_input_instruction(dev_data_path, input_instruction)
 data = open_json_file(dev_data_path)
 
+print("Loading RAG data...")
 documents = load_rag_data(rag_json_path)
 index = initialize_faiss_index(documents, model, tokenizer)
+print(f"{Fore.GREEN}RAG data loaded successfully!\n")
 
 output_data = []
 
