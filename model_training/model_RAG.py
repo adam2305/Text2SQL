@@ -19,19 +19,18 @@ rag_json_path = "../data_processing/data/RAG_data.json"
 
 # Load model
 print("Loading model...")
-bnb_config = BitsAndBytesConfig(load_in_4bit=True)
+bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
 
 tokenizer = AutoTokenizer.from_pretrained(base_model,
                                           use_fast=True,
                                           token=auth_token,
-                                          #dtype=torch.float16
-                                          )
+                                          dtype=torch.bfloat16)
 tokenizer.pad_token = tokenizer.eos_token
 tokenizer.padding_side = "right"
 
 model = AutoModelForCausalLM.from_pretrained(base_model,
                                              device_map="cuda",
-                                             #torch_dtype=torch.float16,
+                                             torch_dtype=torch.bfloat16,
                                              quantization_config=bnb_config,
                                              token=auth_token)
 print(f"{Fore.GREEN}Model loaded successfully!\n")
