@@ -46,18 +46,14 @@ def load_rag_data(rag_json_path):
     return documents
 
 
-def initialize_faiss_index(documents):
+def initialize_faiss_index(documents, model, tokenizer):
     embeddings = []
     for doc in documents:
-        tokenized = tokenizer(doc, padding=True, truncation=True, return_tensors="pt", max_length=512)
-        input_ids = tokenized['input_ids'].to(model.device)
+        inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True).to(model.device)
         with torch.no_grad():
-            embeddings.append(model.transformer(input_ids).last_hidden_state.mean(dim=1).cpu().numpy())
-
-    embeddings = np.array(embeddings).reshape(len(embeddings), -1)
-    index = faiss.IndexFlatL2(embeddings.shape[1])
-    index.add(embeddings)
-    return index
+            outputs = model.base_model(**inputs)
+            embeddings.append(outputs.last_hidden_state.mean(dim=1).cpu().numpy())
+    return embeddings
 
 
 def retrieve_relevant_docs(query, index, documents):
