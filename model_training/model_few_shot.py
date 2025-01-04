@@ -15,7 +15,7 @@ input_instruction = "Convert the following question into an SQL query using the 
 
 
 print("Loading model...")
-bnb_config = BitsAndBytesConfig(load_in_8bit=True)
+bnb_config = BitsAndBytesConfig(load_in_4bit=True)
 
 tokenizer = AutoTokenizer.from_pretrained(base_model,
                                           use_fast=True,
@@ -48,7 +48,7 @@ for format_data in tqdm(data):
                                                 add_generation_prompt=False).to(model.device)
     token_outputs = model.generate(input_ids=token_inputs,
                                    do_sample=True,
-                                   max_new_tokens=512,
+                                   max_new_tokens=256,
                                    temperature=.1).to(model.device)
     new_tokens = token_outputs[0][token_inputs.shape[-1]:]
     answer = tokenizer.decode(new_tokens,
