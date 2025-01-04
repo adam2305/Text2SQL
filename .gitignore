@@ -1,3 +1,7 @@
 .ipynb_checkpoints
 results/
 fine_tuned_bart/
+slurms/
+runs/
+.ipynb_checkpoints/
+models/
