@@ -52,7 +52,7 @@ def initialize_faiss_index(documents, model, tokenizer):
         inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True).to(model.device)
         with torch.no_grad():
             outputs = model.base_model(**inputs)
-            embeddings.append(outputs.last_hidden_state.mean(dim=1).gpu().numpy())
+            embeddings.append(outputs.last_hidden_state.mean(dim=1).cpu().numpy())
     return embeddings
 
 
