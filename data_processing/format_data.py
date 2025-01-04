@@ -13,7 +13,7 @@ def format_data(data_json, table_description):
         for table in table_description:
             if table["db_id"] == db_id and table["schema"] != "":
                 schema = table["schema"]
-                instruction = "Translate the following natural language question into a valid SQL query. Return only the SQL query."
+                instruction = ""
                 output = ""
                 input = data_json["question"][str(i)]
                 gold_output = data_json["query"][str(i)]
