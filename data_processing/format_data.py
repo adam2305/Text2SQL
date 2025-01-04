@@ -32,14 +32,18 @@ def save_json(data, path):
 
 
 table_description = get_json('data/tables_description.json')
+table_description_enhanced = get_json('data/tables_description_enhanced.json')
 raw_train_data = get_json('data/raw_train_data.json')
 raw_dev_data = get_json('data/raw_dev_data.json')
 
 formated_train_data = format_data(raw_train_data, table_description)
 formated_dev_data = format_data(raw_dev_data, table_description)
 
+formated_dev_data_enhanced = format_data(raw_dev_data, table_description_enhanced)
+
 save_json(formated_train_data, 'data/formated_train_data.json')
 save_json(formated_dev_data, 'data/formated_dev_data.json')
+save_json(formated_dev_data_enhanced, 'data/formated_dev_data_enhanced.json')
 
 
 
