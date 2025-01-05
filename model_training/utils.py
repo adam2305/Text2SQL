@@ -16,17 +16,17 @@ def change_input_instruction(path, instruction):
         json.dump(data, file, indent=4)
 
 
-def get_input_gemma_template(data):
-    return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "Example : " + data["question"] + "\n\n" + "tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
-
 def get_input_gemma_template_fewshot(data):
     return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
+             "content": data["instruction"] + "\n\n" + "Example : " + data["example"] + "\n\n" + "tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
+
+def get_input_gemma_template(data):
+    return [{"role": "user",
+             "content": data["instruction"] + "\n\n" + "Tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
 
 def get_input_gemma_template_RAG(data, RAG):
     return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "tables schema : " + data["schema"] + "Relevant information : " + RAG + "\n\n" + "Question : " + data["input"]}]
+             "content": data["instruction"] + "\n\n" + "Tables schema : " + data["schema"] + "Relevant information : " + RAG + "\n\n" + "Question : " + data["input"]}]
 
 def balance_parentheses(query):
     open_count = 0
