@@ -55,8 +55,8 @@ for format_data in tqdm(data):
                               skip_special_tokens=True)
     format_data["output"] = answer
     output_data.append(format_data)
-    print(f"{Fore.YELLOW}Input:", {format_data['input']})
-    print(answer)
+    #print(f"{Fore.YELLOW}Input:", {format_data['input']})
+    #print(answer)
 
 print(f"{Fore.GREEN}Inference completed !\n")
 
