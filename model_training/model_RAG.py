@@ -44,7 +44,7 @@ def load_rag_data(rag_json_path):
     return documents
 
 
-def initialize_faiss_index(documents, model, tokenizer, max_length=512):
+def initialize_faiss_index(documents, model, tokenizer, max_length=128):
     embeddings = []
     for doc in tqdm(documents):
         inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(
@@ -58,14 +58,17 @@ def initialize_faiss_index(documents, model, tokenizer, max_length=512):
     return embeddings
 
 
-def retrieve_relevant_docs(query, index, documents):
-    tokenized_query = tokenizer(query, padding=True, truncation=True, return_tensors="pt", max_length=512)
-    input_ids = tokenized_query['input_ids'].to(model.device)
+def retrieve_relevant_docs(query, index, documents, model, tokenizer, max_length=512):
+    inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(
+        model.device)
     with torch.no_grad():
-        query_embedding = model.transformer(input_ids).last_hidden_state.mean(dim=1).cpu().numpy()
+        outputs = model(**inputs, output_hidden_states=True)
+        last_hidden_state = outputs.hidden_states[-1]  # Get the last layer's hidden states
+        query_embedding = last_hidden_state.mean(dim=1).cpu().numpy()  # Mean pool to get a single vector
 
-    D, I = index.search(query_embedding, k=3)
-    relevant_docs = [documents[i] for i in I[0]]
+    _, indices = index.search(query_embedding, k=3)  # Retrieve top-5 relevant docs
+    relevant_docs = [documents[i] for i in indices[0]]
+
     return relevant_docs
 
 
