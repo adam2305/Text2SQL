@@ -53,9 +53,12 @@ def initialize_faiss_index(documents, model, tokenizer, max_length=128):
             outputs = model(**inputs, output_hidden_states=True)
             last_hidden_state = outputs.hidden_states[-1]
             doc_embedding = last_hidden_state.mean(dim=1).cpu().numpy()
-
             embeddings.append(doc_embedding)
-    return embeddings
+
+    embeddings = np.vstack(embeddings)
+    index = faiss.IndexFlatL2(embeddings.shape[1])
+    index.add(embeddings)
+    return index
 
 
 def retrieve_relevant_docs(query, index, documents, model, tokenizer, max_length=512):
@@ -66,7 +69,7 @@ def retrieve_relevant_docs(query, index, documents, model, tokenizer, max_length
         last_hidden_state = outputs.hidden_states[-1]  # Get the last layer's hidden states
         query_embedding = last_hidden_state.mean(dim=1).cpu().numpy()  # Mean pool to get a single vector
 
-    _, indices = index.search(query_embedding, k=3)  # Retrieve top-5 relevant docs
+    _, indices = index.search(query_embedding, k=3)  # Retrieve top-3 relevant docs
     relevant_docs = [documents[i] for i in indices[0]]
 
     return relevant_docs
