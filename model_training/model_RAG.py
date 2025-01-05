@@ -85,7 +85,7 @@ print(f"{Fore.GREEN}RAG data loaded successfully!\n")
 output_data = []
 
 for format_data in tqdm(data):
-    relevant_docs = retrieve_relevant_docs(format_data['input'], index, documents)
+    relevant_docs = retrieve_relevant_docs(format_data['input'], index, documents, model, tokenizer)
     input = get_input_gemma_template_RAG(format_data, relevant_docs)
     token_inputs = tokenizer.apply_chat_template(input,
                                                 tokenize=True,
