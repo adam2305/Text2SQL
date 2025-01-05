@@ -25,8 +25,9 @@ def get_input_gemma_template(data):
              "content": data["instruction"] + "\n\n" + "Tables schema : " + data["schema"] + "\n\n" + "Question : " + data["input"]}]
 
 def get_input_gemma_template_RAG(data, RAG):
+    RAG = "".join(RAG)
     return [{"role": "user",
-             "content": data["instruction"] + "\n\n" + "Tables schema : " + data["schema"] + "Relevant information : " + "RAG" + "\n\n" + "Question : " + data["input"]}]
+             "content": data["instruction"] + "\n\n" + "Tables schema : " + data["schema"] + "Relevant information : " + RAG + "\n\n" + "Question : " + data["input"]}]
 
 def balance_parentheses(query):
     open_count = 0
