@@ -170,6 +170,76 @@ def get_execution_accuracy(output_path, db_path):
                 connection.close()
     return execution_match
 
+error_categories = {
+    "syntax error": ["syntax error"],
+    "near": ["near"],
+    "no such table": ["no such table"],
+    "no such column": ["no such column"],
+    "unable to open database file": ["unable to open database file"],
+    "timeout": ["timeout"],
+    "szmre": ["szmre"]
+}
+
+def categorize_error(error_message):
+    for category, keywords in error_categories.items():
+        if any(keyword in error_message.lower() for keyword in keywords):
+            return category
+    return "Other Error"
+
+def test_sql_commands_and_categorize_errors(output_path, db_path):
+    results = open_json_file(output_path)
+    sql_errors = []
+    error_counts = {}
+
+    for result in results:
+        sql_command = clean_output(result["output"])
+        sql_command = sql_command.replace("```sql", "").replace("```", "")
+        db_file = os.path.join(db_path, f"{result['db_id']}/{result['db_id']}.sqlite")
+        connection = sqlite3.connect(db_file)
+        cursor = connection.cursor()
+        try:
+            cursor.execute(sql_command)
+        except sqlite3.Error as e:
+            error_message = str(e)
+            category = categorize_error(error_message)
+            sql_errors.append({"db_id": result["db_id"], "error": error_message, "category": category, "sql_command": sql_command})
+            if category in error_counts:
+                error_counts[category] += 1
+            else:
+                error_counts[category] = 1
+        finally:
+            if connection:
+                connection.close()
+
+    return sql_errors, error_counts
+
+# List of common SQL keywords
+sql_keywords = [
+    "JOIN", "INNER JOIN", "LEFT JOIN", "RIGHT JOIN",
+    "FULL JOIN", "GROUP BY", "ORDER BY", "HAVING", "LIMIT", "OFFSET", "UNION", "DISTINCT"
+]
+
+def find_keywords_in_failed_queries(output_path, db_path):
+    results = open_json_file(output_path)
+    failed_queries = []
+
+    for result in results:
+        sql_command = clean_output(result["output"])
+        sql_command = sql_command.replace("```sql", "").replace("```", "")
+        db_file = os.path.join(db_path, f"{result['db_id']}/{result['db_id']}.sqlite")
+        connection = sqlite3.connect(db_file)
+        cursor = connection.cursor()
+        try:
+            cursor.execute(sql_command)
+        except sqlite3.Error as e:
+            error_message = str(e)
+            found_keywords = [keyword for keyword in sql_keywords if keyword in sql_command.upper()]
+            failed_queries.append({"db_id": result["db_id"], "error": error_message, "sql_command": sql_command, "keywords": found_keywords})
+        finally:
+            if connection:
+                connection.close()
+
+    return failed_queries
 
 
 
