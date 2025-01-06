@@ -1,0 +1,132 @@
+import torch
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+from colorama import Fore
+import colorama
+from tqdm import tqdm
+import json
+import faiss
+import numpy as np
+from utils import change_input_instruction, get_input_llama_template_RAG, open_json_file
+
+colorama.init(autoreset=True)
+
+# Initialize variables
+dev_data_path = "../data_processing/data/formated_dev_data.json"
+auth_token_path = "../huggingface_token.txt"
+with open(auth_token_path, 'r') as f:
+    tokens = [line for line in f]
+auth_token = tokens[0]
+base_model = "meta-llama/Llama-3.2-1B"
+input_instruction = "Convert the following question into an SQL query using the provided database schema. The output should contain only the SQL statement."
+rag_json_path = "../data_processing/data/RAG_data.json"
+
+# Load model
+print("Loading model...")
+bnb_config = BitsAndBytesConfig(load_in_4bit=True, bnb_4bit_compute_dtype=torch.float16)
+
+tokenizer = AutoTokenizer.from_pretrained(base_model,
+                                          use_fast=True,
+                                          token=auth_token)
+tokenizer.pad_token = tokenizer.eos_token
+tokenizer.padding_side = "right"
+
+model = AutoModelForCausalLM.from_pretrained(base_model,
+                                             device_map="cuda",
+                                             quantization_config=bnb_config,
+                                             token=auth_token)
+print(f"{Fore.GREEN}Model loaded successfully!\n")
+
+
+def load_rag_data(rag_json_path):
+    with open(rag_json_path, 'r') as f:
+        rag_data = json.load(f)
+    documents = []
+    for db in rag_data:
+        for doc in db['documents']:
+            documents.append(doc['text'])
+    return documents
+
+
+def initialize_faiss_index(documents, model, tokenizer, max_length=128):
+    embeddings = []
+    for doc in tqdm(documents):
+        inputs = tokenizer(doc, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(
+            model.device)
+        with torch.no_grad():
+            outputs = model(**inputs, output_hidden_states=True)
+            last_hidden_state = outputs.hidden_states[-1]
+            doc_embedding = last_hidden_state.mean(dim=1).cpu().numpy()
+            embeddings.append(doc_embedding)
+
+    embeddings = np.vstack(embeddings)
+    index = faiss.IndexFlatL2(embeddings.shape[1])
+    index.add(embeddings)
+    return index
+
+
+def retrieve_relevant_docs(query, index, documents, model, tokenizer, max_length=512):
+    inputs = tokenizer(query, return_tensors="pt", padding=True, truncation=True, max_length=max_length).to(
+        model.device)
+    with torch.no_grad():
+        outputs = model(**inputs, output_hidden_states=True)
+        last_hidden_state = outputs.hidden_states[-1]  # Get the last layer's hidden states
+        query_embedding = last_hidden_state.mean(dim=1).cpu().numpy()  # Mean pool to get a single vector
+
+    _, indices = index.search(query_embedding, k=3)  # Retrieve top-3 relevant docs
+    relevant_docs = [documents[i] for i in indices[0]]
+
+    return relevant_docs
+
+
+# Process data
+print("Starting inference...")
+change_input_instruction(dev_data_path, input_instruction)
+data = open_json_file(dev_data_path)
+
+print("Loading RAG data...")
+documents = load_rag_data(rag_json_path)
+index = initialize_faiss_index(documents, model, tokenizer)
+print(f"{Fore.GREEN}RAG data loaded successfully!\n")
+
+output_data = []
+
+for format_data in tqdm(data):
+    relevant_docs = retrieve_relevant_docs(format_data['input'], index, documents, model, tokenizer)
+    input_data = get_input_llama_template_RAG(format_data, relevant_docs)
+
+    token_inputs = tokenizer(input_data,
+                             return_tensors="pt",
+                             padding=True, 
+                             truncation=True,
+                             max_length=512).to(model.device)
+
+    token_outputs = model.generate(input_ids=token_inputs["input_ids"],
+                                   do_sample=True,
+                                   max_new_tokens=256,
+                                   temperature=.1).to(model.device)
+    """
+    token_inputs = tokenizer.apply_chat_template(input,
+                                                tokenize=True,
+                                                token=auth_token,
+                                                return_tensors="pt",
+                                                use_fast=True,
+                                                add_generation_prompt=False).to(model.device)
+    token_outputs = model.generate(input_ids=token_inputs,
+                                   do_sample=True,
+                                   max_new_tokens=256,
+                                   temperature=.1).to(model.device)
+    """
+    new_tokens = token_outputs[0][token_inputs["input_ids"].shape[-1]:]
+    answer = tokenizer.decode(new_tokens,
+                              skip_special_tokens=True)
+    format_data["output"] = answer
+    output_data.append(format_data)
+    #print(f"{Fore.YELLOW}Input:", {format_data['input']})
+    #print(answer)
+
+print(f"{Fore.GREEN}Inference completed !\n")
+
+print("Saving results...\n")
+with open("outputs/RAG_results.json", "w") as f:
+    json.dump(output_data, f)
+print(f"{Fore.GREEN}Results saved successfully !\n")
